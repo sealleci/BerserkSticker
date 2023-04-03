@@ -1,0 +1,8 @@
+{
+    "path-intellisense.mappings": {
+        "@": "${workspaceRoot}/src/"
+    },
+    "less.compile": {
+        "out": "../css/"
+    }
+}
