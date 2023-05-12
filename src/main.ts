@@ -1,10 +1,12 @@
-import App from '@/App.vue';
-import '@/css/style.css';
-import router from '@/router';
-import vuex from '@/store';
-import { createApp } from 'vue';
+import App from '@/App.vue'
+import '@/css/style.css'
+import router from '@/router'
+import { createPinia } from 'pinia'
+import { createApp } from 'vue'
+
+const pinia = createPinia()
 
 createApp(App)
     .use(router)
-    .use(vuex)
+    .use(pinia)
     .mount('#app')

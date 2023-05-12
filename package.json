@@ -9,9 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@opentiny/vue": "^3.6.7",
+    "konva": "^9.0.1",
+    "pinia": "^2.0.36",
     "vue": "^3.2.45",
-    "vue-router": "^4.1.6",
-    "vuex": "^4.1.0"
+    "vue-advanced-cropper": "^2.8.8",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
