@@ -68,7 +68,7 @@ watch(isModalShow, (new_value) => {
 .tiny-modal {
     :deep(&__box) {
         top: @modal__margin__top !important;
-        height: calc(100vh - @modal__margin__top * 2);
+        height: calc(var(--vh, 1vh) * 100 - @modal__margin__top * 2);
         border: none !important;
         box-shadow: none !important;
         background-color: transparent;

@@ -1,5 +1,23 @@
 <script setup lang="ts">
-import MyAside from '@/components/MyAside.vue';
+import MyAside from '@/components/MyAside.vue'
+import MyStage from '@/components/MyStage.vue'
+import { onMounted } from 'vue'
+onMounted(() => {
+  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+
+  window.addEventListener('resize', () => {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+  })
+
+  window.addEventListener('touchmove', (event) => {
+    const touch1 = event.touches[0]
+    const touch2 = event.touches[1]
+
+    if (touch1 && touch2) {
+      event.preventDefault()
+    }
+  }, { passive: false })
+})
 </script>
 
 <template>
@@ -8,7 +26,7 @@ import MyAside from '@/components/MyAside.vue';
       <my-aside></my-aside>
     </aside>
     <main>
-      <router-view />
+      <my-stage></my-stage>
     </main>
   </div>
 </template>
@@ -20,6 +38,7 @@ import MyAside from '@/components/MyAside.vue';
   position: relative;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 main {

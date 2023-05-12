@@ -22,7 +22,6 @@ The pictures are collected from the Internet. If there are infringing pictures, 
 - Vite
 - TypeScript
 - Less.js
-- Vue Router
 - Pinia
 - OpenTiny Vue
 - Konva.js

@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 export default defineConfig({
-  base: './',
+  base: '',
   css: {
     preprocessorOptions: {
       less: {
@@ -14,17 +14,27 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src')
-    }
+    },
+    extensions: ['.js', '.jsx', '.vue', 'ts', 'tsx']
   },
-  plugins: [vue()],
+  plugins: [
+    vue()
+  ],
   define: {
     'process.env': { ...process.env }
   },
+  server: {
+    host: '0.0.0.0',
+    port: 8080
+  },
+  assetsInclude: ['public', 'src/assets'],
   build: {
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['vue', 'konva', 'pinia', 'vue-router', 'vue-advanced-cropper', '@opentiny/vue']
+          vue: ['vue', 'pinia'],
+          ui: ['@opentiny/vue'],
+          graphic: ['konva', 'vue-advanced-cropper'],
         }
       }
     }

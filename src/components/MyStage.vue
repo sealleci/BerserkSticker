@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useKonvaNodeStore } from '@/store/konva_node'
-import { getShape } from '@/utils/shape'
+import { useKonvaNodeStore } from '@/store/konva_node.ts'
+import { getShape } from '@/utils/shape.ts'
 import Konva from 'konva'
 import { Ref, onMounted, onUnmounted, ref, watch } from 'vue'
 
@@ -31,11 +31,20 @@ const save_id = new IncrementingId()
 const background_image = new window.Image()
 const BACKGROUND_IMAGE_NAME = 'background'
 const REMOVE_BUTTON_RADIUS: number = 10
-let last_dist: number = 0
 let selected_node_name: string = ''
+let last_center: MyCoordinate | null = null
+let last_dist: number = 0
+let is_shape_scaling: boolean = false
 
 function getDistance(p1: MyCoordinate, p2: MyCoordinate): number {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+}
+
+function getCenter(p1: MyCoordinate, p2: MyCoordinate): MyCoordinate {
+    return {
+        x: (p1.x + p2.x) / 2,
+        y: (p1.y + p2.y) / 2
+    }
 }
 
 function updateRemoveButtonPosition() {
@@ -44,12 +53,11 @@ function updateRemoveButtonPosition() {
 }
 
 function scaleForWheel(event: Konva.KonvaEventObject<WheelEvent>) {
-    const stage_node = stage.value.getStage()!
     const SCALE_PROC: number = 1.2
-    const pointer = stage_node.getPointerPosition()!
+    const pointer = stage.value.getPointerPosition()!
     const relative_pointer: MyCoordinate = {
-        x: pointer.x - stage_node.getAbsolutePosition().x,
-        y: pointer.y - stage_node.getAbsolutePosition().y
+        x: pointer.x - stage.value.getAbsolutePosition().x,
+        y: pointer.y - stage.value.getAbsolutePosition().y
     }
     let is_zoom_in = true
 
@@ -70,36 +78,70 @@ function scaleForWheel(event: Konva.KonvaEventObject<WheelEvent>) {
         is_zoom_in = false
     }
 
-    stage_node.absolutePosition({
-        x: stage_node.getAbsolutePosition().x - relative_pointer.x * ((is_zoom_in ? SCALE_PROC : 1.0 / SCALE_PROC) - 1.0),
-        y: stage_node.getAbsolutePosition().y - relative_pointer.y * ((is_zoom_in ? SCALE_PROC : 1.0 / SCALE_PROC) - 1.0)
+    stage.value.absolutePosition({
+        x: stage.value.getAbsolutePosition().x - relative_pointer.x * ((is_zoom_in ? SCALE_PROC : 1.0 / SCALE_PROC) - 1.0),
+        y: stage.value.getAbsolutePosition().y - relative_pointer.y * ((is_zoom_in ? SCALE_PROC : 1.0 / SCALE_PROC) - 1.0)
     })
 
     updateRemoveButtonPosition()
 }
 
 function scaleForTouch(event: Konva.KonvaEventObject<TouchEvent>) {
+    if (is_shape_scaling) { return }
+
     const touch1 = event.evt.touches[0]
     const touch2 = event.evt.touches[1]
 
     if (touch1 && touch2) {
-        const cur_dist = getDistance(
-            {
-                x: touch1.clientX,
-                y: touch1.clientY,
-            },
-            {
-                x: touch2.clientX,
-                y: touch2.clientY,
-            }
-        )
-        const scale_proc = (stage.value.scale()!.x * cur_dist) / last_dist
+        if (stage.value.isDragging()) {
+            stage.value.stopDrag()
+        }
+
+        const p1: MyCoordinate = {
+            x: touch1.clientX,
+            y: touch1.clientY
+        }
+        const p2: MyCoordinate = {
+            x: touch2.clientX,
+            y: touch2.clientY
+        }
+        const new_center = getCenter(p1, p2)
+        const cur_dist = getDistance(p1, p2)
+
+        if (!last_center) {
+            last_center = getCenter(p1, p2)
+            return
+        }
+
+        if (last_dist === 0) {
+            last_dist = cur_dist
+        }
+
+        const scale_proc = stage.value.scale()!.x * (cur_dist / last_dist)
+        const cur_scale: number = scale_proc / stage.value.scale()!.x
+        const relative_center: MyCoordinate = {
+            x: (new_center.x - stage.value.getAbsolutePosition().x),
+            y: (new_center.y - stage.value.getAbsolutePosition().y)
+        }
 
         stage.value.scale({
             x: scale_proc,
             y: scale_proc
         })
+
+        const diff_position: MyCoordinate = {
+            x: new_center.x - last_center.x,
+            y: new_center.y - last_center.y
+        }
+        const new_pos: MyCoordinate = {
+            x: stage.value.absolutePosition().x - relative_center.x * (cur_scale - 1.0) + diff_position.x,
+            y: stage.value.absolutePosition().y - relative_center.y * (cur_scale - 1.0) + diff_position.y,
+        }
+
+        stage.value.absolutePosition(new_pos)
+
         last_dist = cur_dist
+        last_center = new_center
 
         updateRemoveButtonPosition()
     }
@@ -107,6 +149,7 @@ function scaleForTouch(event: Konva.KonvaEventObject<TouchEvent>) {
 
 function scaleForTouchEnd() {
     last_dist = 0
+    last_center = null
 }
 
 function updateStageSize() {
@@ -136,11 +179,13 @@ function updateTransformer() {
 function selectNode(event: Konva.KonvaEventObject<MouseEvent | TouchEvent>) {
     if (event.target === stage.value) {
         selected_node_name = ''
+        is_shape_scaling = false
         updateTransformer()
         return
     }
 
     if (event.target.parent && event.target.parent.className === 'Transformer') {
+        is_shape_scaling = false
         return
     }
 
@@ -148,6 +193,7 @@ function selectNode(event: Konva.KonvaEventObject<MouseEvent | TouchEvent>) {
 
     if (name === BACKGROUND_IMAGE_NAME) {
         selected_node_name = ''
+        is_shape_scaling = false
     } else {
         selected_node_name = name
     }
@@ -169,6 +215,22 @@ function replaceBackgroundNode(date_url: string) {
     layer.value.draw()
 }
 
+function touchMoveOnShape(event: Konva.KonvaEventObject<TouchEvent>) {
+    const touch1 = event.evt.touches[0]
+    const touch2 = event.evt.touches[1]
+
+    if (touch1 && touch2) {
+        is_shape_scaling = true
+        if (stage.value.isDragging()) {
+            stage.value.stopDrag()
+        }
+    }
+}
+
+function touchEndOnShape() {
+    is_shape_scaling = false
+}
+
 function addAvatarNode(date_url: string) {
     const avatar_image = new window.Image()
     avatar_image.src = date_url
@@ -186,10 +248,14 @@ function addAvatarNode(date_url: string) {
         offsetY: - avatar_image.height / 2
     })
 
+    new_avatar_node.on('touchmove', touchMoveOnShape)
+    new_avatar_node.on('touchend', touchEndOnShape)
+
     layer.value.add(
         new_avatar_node
     )
     transformer.value.nodes([new_avatar_node])
+    updateRemoveButtonPosition()
 }
 
 function addShapeNode() {
@@ -201,8 +267,12 @@ function addShapeNode() {
             x: -SIZE * 2,
             y: -SIZE * 2
         })
+        new_shape_node.on('touchmove', touchMoveOnShape)
+        new_shape_node.on('touchend', touchEndOnShape)
+
         layer.value.add(new_shape_node)
         transformer.value.nodes([new_shape_node])
+        updateRemoveButtonPosition()
     }
 }
 
@@ -252,6 +322,17 @@ function saveImage() {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+}
+
+function relocate() {
+    stage.value.position({
+        x: 0,
+        y: 0
+    })
+    stage.value.scale({
+        x: 1.0,
+        y: 1.0
+    })
 }
 
 onMounted(() => {
@@ -354,6 +435,13 @@ watch(() => konva_node_store.is_trigger_save_image, () => {
         konva_node_store.is_trigger_save_image = false
     }
 })
+
+watch(() => konva_node_store.is_trigger_relocate, () => {
+    if (konva_node_store.is_trigger_relocate) {
+        relocate()
+        konva_node_store.is_trigger_relocate = false
+    }
+})
 </script>
 
 <template>
@@ -362,7 +450,7 @@ watch(() => konva_node_store.is_trigger_save_image, () => {
 </template>
 
 <style scoped lang="less">
-.stage {
+#stage {
     overflow: hidden;
 }
 </style>

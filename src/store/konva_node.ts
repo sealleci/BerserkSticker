@@ -11,6 +11,7 @@ interface KonvaNodeState {
     shape_node: ShapeNode
     is_trigger_add_shape_node: boolean
     is_trigger_save_image: boolean
+    is_trigger_relocate: boolean
 }
 
 export const useKonvaNodeStore = defineStore(
@@ -23,6 +24,7 @@ export const useKonvaNodeStore = defineStore(
             color: ''
         },
         is_trigger_add_shape_node: false,
-        is_trigger_save_image: false
+        is_trigger_save_image: false,
+        is_trigger_relocate: false
     })
 })

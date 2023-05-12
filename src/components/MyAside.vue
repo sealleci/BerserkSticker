@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CropperModal from '@/components/CropperModal.vue'
-import { ShapeNode, useKonvaNodeStore } from '@/store/konva_node'
-import { getShape } from '@/utils/shape'
+import { ShapeNode, useKonvaNodeStore } from '@/store/konva_node.ts'
+import { getShape } from '@/utils/shape.ts'
 import {
     Button as TinyButton,
     Collapse as TinyCollapse,
@@ -9,7 +9,13 @@ import {
     TabItem as TinyTabItem,
     Tabs as TinyTabs
 } from '@opentiny/vue'
-import { IconChevronLeft, IconPlus, IconSave, IconUpload } from '@opentiny/vue-icon'
+import {
+    IconChevronLeft,
+    IconMinscreenLeft,
+    IconPlus,
+    IconSave,
+    IconUpload
+} from '@opentiny/vue-icon'
 import Konva from 'konva'
 import { Ref, onMounted, ref } from 'vue'
 import 'vue-advanced-cropper/dist/style.css'
@@ -24,7 +30,7 @@ import img_s3 from '@/assets/img/s3.jpg'
 
 type OperationItem = {
     name: string
-    icon: string
+    icon: any
     handler: () => void
 }
 
@@ -78,12 +84,12 @@ const ChevronLeftIcon = IconChevronLeft()
 const UploadIcon = IconUpload()
 const PlusIcon = IconPlus()
 const SaveIcon = IconSave()
+const MinscreenLeftIcon = IconMinscreenLeft()
 let is_aside_open: boolean = false
 const is_small_screen = ref(false)
 const active_collapse_item_list: Ref<string[]> = ref(['templates'])
 const active_tab_item: Ref<string> = ref('templates')
 const is_modal_show = ref(false)
-const PATH_PREFIX: string = '../assets/img'
 const avatar_list = ref(new GeneralList([img_r1]))
 const avatar_data_url: Ref<string> = ref('')
 const shape_color_list: string[] = [
@@ -115,8 +121,13 @@ const selected_shape_node_type: Ref<ShapeNode['type']> = ref('')
 const operation_list: OperationItem[] = [
     {
         name: 'Save',
-        icon: 'SaveIcon',
+        icon: SaveIcon,
         handler: triggerSaveImage
+    },
+    {
+        name: 'Relocate',
+        icon: MinscreenLeftIcon,
+        handler: triggerRelocate
     }
 ]
 const BACKGROUND_FILE_NAME_LIST: string[] = [
@@ -220,6 +231,10 @@ function triggerSaveImage() {
     konva_node_store.is_trigger_save_image = true
 }
 
+function triggerRelocate() {
+    konva_node_store.is_trigger_relocate = true
+}
+
 function updateShapePreviews() {
     const SIZE: number = 48
     const default_circle = new Konva.Circle({
@@ -311,7 +326,6 @@ onMounted(() => {
                         :key="index" @click="item.handler">
                         <span>{{ item.name }}</span>
                         <component :is="item.icon"></component>
-                        <save-icon></save-icon>
                     </tiny-button>
                 </tiny-collapse-item>
             </tiny-collapse>
@@ -366,7 +380,6 @@ onMounted(() => {
                             :key="index" @click="item.handler">
                             <span>{{ item.name }}</span>
                             <component :is="item.icon"></component>
-                            <save-icon></save-icon>
                         </tiny-button>
                     </div>
                 </tiny-tab-item>
@@ -386,7 +399,7 @@ onMounted(() => {
 
 @collapse_icon__radius: 1.5rem;
 @aside__width: 15rem;
-@aside__height: 24rem;
+@aside__height: 20rem;
 @tab__nav__height: 3rem;
 @general_list__margin__top: .25rem;
 @row_button__height: 3rem;
@@ -569,9 +582,17 @@ onMounted(() => {
 
     :deep(&__nav) {
         height: 100%;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 
     :deep(&__item) {
+        flex-shrink: 0;
         height: 100%;
         margin: 0 1rem !important;
         color: @grey;
