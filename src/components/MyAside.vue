@@ -1,13 +1,20 @@
 <script setup lang="ts">
+import img_b1 from '@/assets/img/b1.png'
+import img_b2 from '@/assets/img/b2.png'
+import img_b3 from '@/assets/img/b3.png'
+import img_r1 from '@/assets/img/r1.png'
+import img_s1 from '@/assets/img/s1.jpg'
+import img_s2 from '@/assets/img/s2.jpg'
+import img_s3 from '@/assets/img/s3.jpg'
 import CropperModal from '@/components/CropperModal.vue'
 import { ShapeNode, useKonvaNodeStore } from '@/store/konva_node.ts'
 import { getShape } from '@/utils/shape.ts'
 import {
-    Button as TinyButton,
-    Collapse as TinyCollapse,
-    CollapseItem as TinyCollapseItem,
-    TabItem as TinyTabItem,
-    Tabs as TinyTabs
+    Button,
+    Collapse,
+    CollapseItem,
+    TabItem,
+    Tabs
 } from '@opentiny/vue'
 import {
     IconChevronLeft,
@@ -19,14 +26,6 @@ import {
 import Konva from 'konva'
 import { Ref, onMounted, ref } from 'vue'
 import 'vue-advanced-cropper/dist/style.css'
-
-import img_b1 from '@/assets/img/b1.png'
-import img_b2 from '@/assets/img/b2.png'
-import img_b3 from '@/assets/img/b3.png'
-import img_r1 from '@/assets/img/r1.png'
-import img_s1 from '@/assets/img/s1.jpg'
-import img_s2 from '@/assets/img/s2.jpg'
-import img_s3 from '@/assets/img/s3.jpg'
 
 type OperationItem = {
     name: string
@@ -274,116 +273,116 @@ onMounted(() => {
 <template>
     <div class="aside">
         <div class="aside__container">
-            <tiny-collapse v-model="active_collapse_item_list" v-if="!is_small_screen" @change="clickCollapseItem">
-                <tiny-collapse-item title="Templates" name="templates">
+            <collapse v-model="active_collapse_item_list" v-if="!is_small_screen" @change="clickCollapseItem">
+                <collapse-item title="Templates" name="templates">
                     <label class="upload_button">
                         <input type="file" accept="image/*" @change="uploadBackground">
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list background_list">
-                        <tiny-button class="general_list__item background_list__item background_list__item--middle"
+                        <Button class="general_list__item background_list__item background_list__item--middle"
                             v-for="(item, index) in background_list.data" :key="index"
                             @click="triggerReplaceBackgroundNode(item.value)">
                             <img :src="item.value" />
                             <span>Meta</span>
-                        </tiny-button>
+                        </Button>
                     </div>
-                </tiny-collapse-item>
-                <tiny-collapse-item title="Avatars" name="avatars">
+                </collapse-item>
+                <collapse-item title="Avatars" name="avatars">
                     <label class="upload_button">
                         <input type="file" accept="image/*" @change="uploadAvatar">
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list avatar_list">
-                        <tiny-button class="general_list__item avatar_list__item avatar_list__item--middle"
+                        <Button class="general_list__item avatar_list__item avatar_list__item--middle"
                             v-for="(item, index) in avatar_list.data" :key="index"
                             @click="triggerAddAvatarNode(item.value)">
                             <img :src="item.value" />
                             <span>777</span>
                             <plus-icon></plus-icon>
-                        </tiny-button>
+                        </Button>
                     </div>
-                </tiny-collapse-item>
-                <tiny-collapse-item title="Shapes" name="shapes">
+                </collapse-item>
+                <collapse-item title="Shapes" name="shapes">
                     <div class="general_list shape_color_list">
-                        <tiny-button class="general_list__item shape_color_list__item" circle
+                        <Button class="general_list__item shape_color_list__item" circle
                             v-for="(item, index) in shape_color_list" :key="index" @click="changeShapeColor(item)"
                             :style="{ backgroundColor: item }">
-                        </tiny-button>
+                        </Button>
                     </div>
                     <div class="general_list shape_list">
-                        <tiny-button class="general_list__item shape_list__item shape_list__item--middle"
+                        <Button class="general_list__item shape_list__item shape_list__item--middle"
                             v-for="(item, index) in shape_list" :key="index"
                             @click="triggerAddShapeNode(item.type as ShapeNode['type'])">
                             <img :src="item.image.value" />
                             <span>{{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}</span>
                             <plus-icon></plus-icon>
-                        </tiny-button>
+                        </Button>
                     </div>
-                </tiny-collapse-item>
-                <tiny-collapse-item title="Operations" name="operations">
-                    <tiny-button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
+                </collapse-item>
+                <collapse-item title="Operations" name="operations">
+                    <Button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
                         :key="index" @click="item.handler">
                         <span>{{ item.name }}</span>
                         <component :is="item.icon"></component>
-                    </tiny-button>
-                </tiny-collapse-item>
-            </tiny-collapse>
-            <tiny-tabs v-model="active_tab_item" v-else @click="clickTabItem">
-                <tiny-tab-item title="Templates" name="templates">
+                    </Button>
+                </collapse-item>
+            </collapse>
+            <tabs v-model="active_tab_item" v-else @click="clickTabItem">
+                <tab-item title="Templates" name="templates">
                     <label class="upload_button">
                         <input type="file" accept="image/*" @change="uploadBackground">
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list background_list">
-                        <tiny-button class="general_list__item background_list__item"
+                        <Button class="general_list__item background_list__item"
                             v-for="(item, index) in background_list.data" :key="index"
                             @click="triggerReplaceBackgroundNode(item.value)">
                             <img :src="item.value" />
                             <span>Meta</span>
-                        </tiny-button>
+                        </Button>
                     </div>
-                </tiny-tab-item>
-                <tiny-tab-item title="Avatars" name="avatars">
+                </tab-item>
+                <tab-item title="Avatars" name="avatars">
                     <label class="upload_button">
                         <input type="file" accept="image/*" @change="uploadAvatar">
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list avatar_list">
-                        <tiny-button class="general_list__item avatar_list__item" v-for="(item, index) in avatar_list.data"
+                        <Button class="general_list__item avatar_list__item" v-for="(item, index) in avatar_list.data"
                             :key="index" @click="triggerAddAvatarNode(item.value)">
                             <img :src="item.value" />
                             <span>777</span>
                             <plus-icon></plus-icon>
-                        </tiny-button>
+                        </Button>
                     </div>
-                </tiny-tab-item>
-                <tiny-tab-item title="Shapes" name="shapes">
+                </tab-item>
+                <tab-item title="Shapes" name="shapes">
                     <div class="general_list shape_color_list">
-                        <tiny-button class="general_list__item shape_color_list__item" circle
+                        <Button class="general_list__item shape_color_list__item" circle
                             v-for="(item, index) in shape_color_list" :key="index" @click="changeShapeColor(item)"
                             :style="{ backgroundColor: item }">
-                        </tiny-button>
+                        </Button>
                     </div>
                     <div class="general_list shape_list">
-                        <tiny-button class="general_list__item shape_list__item" v-for="(item, index) in shape_list"
-                            :key="index" @click="triggerAddShapeNode(item.type as ShapeNode['type'])">
+                        <Button class="general_list__item shape_list__item" v-for="(item, index) in shape_list" :key="index"
+                            @click="triggerAddShapeNode(item.type as ShapeNode['type'])">
                             <img :src="item.image.value" />
                             <span>{{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}</span>
                             <plus-icon></plus-icon>
-                        </tiny-button>
+                        </Button>
                     </div>
-                </tiny-tab-item>
-                <tiny-tab-item title="Operations" name="operations">
+                </tab-item>
+                <tab-item title="Operations" name="operations">
                     <div class="general_list operation_list">
-                        <tiny-button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
+                        <Button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
                             :key="index" @click="item.handler">
                             <span>{{ item.name }}</span>
                             <component :is="item.icon"></component>
-                        </tiny-button>
+                        </Button>
                     </div>
-                </tiny-tab-item>
-            </tiny-tabs>
+                </tab-item>
+            </tabs>
         </div>
         <div class="collapse_button" @click="toggleAside">
             <chevron-left-icon></chevron-left-icon>

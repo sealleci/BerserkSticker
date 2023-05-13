@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import CropperStencil from '@/components/CropperStencil.vue'
 import {
-    Button as TinyButton,
-    Modal as TinyModal
+    Button,
+    Modal
 } from '@opentiny/vue'
 import { IconClose } from '@opentiny/vue-icon'
 import { Ref, onMounted, ref, toRefs, watch } from 'vue'
@@ -43,7 +43,7 @@ watch(isModalShow, (new_value) => {
 })
 </script>
 <template>
-    <tiny-modal class="cropper_modal" v-model="is_modal_show_local" :showHeader="false">
+    <modal class="cropper_modal" v-model="is_modal_show_local" :showHeader="false">
         <div class="cropper_modal__row cropper_modal__row--first">
             <div class="cropper_modal__close_button" @click="emits('closeModal')">
                 <close-icon></close-icon>
@@ -53,9 +53,9 @@ watch(isModalShow, (new_value) => {
             aspectRatio: 1 / 1
         }" :stencilComponent="CropperStencil" />
         <div class="cropper_modal__row cropper_modal__row--last">
-            <tiny-button class="crop_button" @click="crop" round>Crop</tiny-button>
+            <Button class="crop_button" @click="crop" round>Crop</Button>
         </div>
-    </tiny-modal>
+    </modal>
 </template>
 <style scoped lang="less">
 @import (reference) "@/less/general.less";

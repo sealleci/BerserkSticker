@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { IconScissor } from '@opentiny/vue-icon'
-import { computed, onMounted } from 'vue'
+import { IconScissor } from '@opentiny/vue-icon';
+import { computed, onMounted } from 'vue';
 import {
     DragEvent,
     DraggableArea,
@@ -8,7 +8,7 @@ import {
     MoveEvent,
     ResizeEvent,
     StencilPreview
-} from 'vue-advanced-cropper'
+} from 'vue-advanced-cropper';
 
 const ScissorIcon = IconScissor()
 const props = defineProps<

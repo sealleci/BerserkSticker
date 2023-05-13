@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useKonvaNodeStore } from '@/store/konva_node.ts'
-import { getShape } from '@/utils/shape.ts'
-import Konva from 'konva'
-import { Ref, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useKonvaNodeStore } from '@/store/konva_node.ts';
+import { getShape } from '@/utils/shape.ts';
+import Konva from 'konva';
+import { Ref, onMounted, onUnmounted, ref, watch } from 'vue';
 
 type MyCoordinate = { x: number, y: number }
 
@@ -31,6 +31,8 @@ const save_id = new IncrementingId()
 const background_image = new window.Image()
 const BACKGROUND_IMAGE_NAME = 'background'
 const REMOVE_BUTTON_RADIUS: number = 10
+const SMALL_SCREEN_WIDTH: number = 640
+const INIT_PADDING: number = 40
 let selected_node_name: string = ''
 let last_center: MyCoordinate | null = null
 let last_dist: number = 0
@@ -235,8 +237,8 @@ function addAvatarNode(date_url: string) {
     const avatar_image = new window.Image()
     avatar_image.src = date_url
     const new_avatar_node = new Konva.Circle({
-        x: -avatar_image.width,
-        y: -avatar_image.height,
+        x: (background_image.width - avatar_image.width) / 2,
+        y: (background_image.height - avatar_image.height) / 2,
         radius: avatar_image.width / 2,
         fillPatternImage: avatar_image,
         fillPatternRepeat: 'no-repeat',
@@ -254,8 +256,10 @@ function addAvatarNode(date_url: string) {
     layer.value.add(
         new_avatar_node
     )
-    transformer.value.nodes([new_avatar_node])
-    updateRemoveButtonPosition()
+    // transformer.value.nodes([new_avatar_node])
+    // updateRemoveButtonPosition()
+    selected_node_name = new_avatar_node.name()
+    updateTransformer()
 }
 
 function addShapeNode() {
@@ -264,15 +268,17 @@ function addShapeNode() {
 
     if (new_shape_node) {
         new_shape_node.position({
-            x: -SIZE * 2,
-            y: -SIZE * 2
+            x: background_image.width / 2 - SIZE,
+            y: background_image.height / 2 - SIZE
         })
         new_shape_node.on('touchmove', touchMoveOnShape)
         new_shape_node.on('touchend', touchEndOnShape)
 
         layer.value.add(new_shape_node)
-        transformer.value.nodes([new_shape_node])
-        updateRemoveButtonPosition()
+        // transformer.value.nodes([new_shape_node])
+        // updateRemoveButtonPosition()
+        selected_node_name = new_shape_node.name()
+        updateTransformer()
     }
 }
 
@@ -323,11 +329,10 @@ function saveImage() {
     link.click()
     document.body.removeChild(link)
 }
-
 function relocate() {
     stage.value.position({
-        x: 0,
-        y: 0
+        x: document.body.clientWidth > SMALL_SCREEN_WIDTH ? (document.querySelector<HTMLElement>('.aside')?.offsetWidth ?? 0) + INIT_PADDING : 0,
+        y: document.body.clientWidth > SMALL_SCREEN_WIDTH ? INIT_PADDING : 0
     })
     stage.value.scale({
         x: 1.0,
@@ -337,6 +342,7 @@ function relocate() {
 
 onMounted(() => {
     const STROKE_WIDTH: number = 1
+    const RED_COLOR: string = '#E76161'
 
     Konva.hitOnDragEnabled = true
 
@@ -356,16 +362,21 @@ onMounted(() => {
     remove_button.value = new Konva.Circle({
         y: -50,
         radius: REMOVE_BUTTON_RADIUS,
-        stroke: '#E76161',
+        stroke: RED_COLOR,
         fill: 'white',
         strokeWidth: STROKE_WIDTH
     })
     remove_button_line.value = new Konva.Line({
         y: -50,
         points: [0, 0, REMOVE_BUTTON_RADIUS * 2, 0],
-        stroke: '#E76161',
+        stroke: RED_COLOR,
         strokeWidth: STROKE_WIDTH + 1
     })
+
+    if (document.body.offsetWidth > SMALL_SCREEN_WIDTH) {
+        stage.value.x((document.querySelector<HTMLElement>('.aside')?.offsetWidth ?? 0) + INIT_PADDING)
+        stage.value.y(INIT_PADDING)
+    }
 
     stage.value.on('wheel', scaleForWheel)
     stage.value.on('touchmove', scaleForTouch)
