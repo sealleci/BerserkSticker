@@ -154,7 +154,7 @@ function toggleAside() {
 }
 
 function clickCollapseItem(active_items: string[]) {
-    if (active_items.length != 0) {
+    if (active_items.length !== 0) {
         active_tab_item.value = active_items[0]
     }
 }

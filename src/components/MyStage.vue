@@ -420,7 +420,7 @@ onMounted(() => {
 onUnmounted(() => { window.removeEventListener('resize', updateStageSize) })
 
 watch(() => konva_node_store.avatar_node, () => {
-    if (konva_node_store.avatar_node && konva_node_store.avatar_node != '') {
+    if (konva_node_store.avatar_node && konva_node_store.avatar_node !== '') {
         addAvatarNode(konva_node_store.avatar_node)
         konva_node_store.avatar_node = ''
     }
@@ -434,7 +434,7 @@ watch(() => konva_node_store.is_trigger_add_shape_node, () => {
 })
 
 watch(() => konva_node_store.background_node, () => {
-    if (konva_node_store.background_node && konva_node_store.background_node != '') {
+    if (konva_node_store.background_node && konva_node_store.background_node !== '') {
         replaceBackgroundNode(konva_node_store.background_node)
         konva_node_store.background_node = ''
     }
