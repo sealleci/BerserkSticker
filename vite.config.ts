@@ -16,25 +16,23 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src')
     },
-    extensions: ['.js', '.jsx', '.vue', 'ts', 'tsx']
+    extensions: ['.js', '.jsx', '.vue']
   },
   plugins: [
     vue(),
     importPlugin(
       [
         {
-          libraryName: '@opentiny/vue',
-          split: '-'
+          libraryName: '@opentiny/vue'
         },
         {
           libraryName: `@opentiny/vue-icon`,
-          libraryDirectory: 'lib',
           customName: (name) => {
             return `@opentiny/vue-icon/lib/${name.replace(/^icon-/, '')}.js`
           }
         }
       ],
-      undefined
+      'pc'
     )
   ],
   define: {
@@ -50,7 +48,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           vue: ['vue', 'pinia'],
-          ui: ['@opentiny/vue-button', '@opentiny/vue-collapse', '@opentiny/vue-tabs', '@opentiny/vue-modal', '@opentiny/vue-icon', '@opentiny/vue-tab-item', '@opentiny/vue-collapse-item'],
+          ui1: ['@opentiny/vue-button', '@opentiny/vue-tabs', '@opentiny/vue-modal'],
+          ui2: ['@opentiny/vue-collapse', '@opentiny/vue-collapse-item', '@opentiny/vue-tab-item'],
           graphic: ['konva', 'vue-advanced-cropper'],
         }
       }

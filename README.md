@@ -8,7 +8,7 @@ HAPPY BIRTHDAY!
 
 A simple photo editor with stickers. "Berserk" theme.
 
-# Images
+## Images
 
 The pictures are collected from the Internet. If there are infringing pictures, they will be deleted.
 

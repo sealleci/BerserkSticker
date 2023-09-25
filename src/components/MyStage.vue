@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useKonvaNodeStore } from '@/store/konva_node.ts';
-import { getShape } from '@/utils/shape.ts';
-import Konva from 'konva';
-import { Ref, onMounted, onUnmounted, ref, watch } from 'vue';
+import { Ref, onMounted, onUnmounted, ref, watch } from 'vue'
+import Konva from 'konva'
+import { useKonvaNodeStore } from '@/store/konva_node.ts'
+import { getShape } from '@/utils/shape.ts'
 
-type MyCoordinate = { x: number, y: number }
+type Coordinate = { x: number, y: number }
 
 class IncrementingId {
     private id: number
@@ -34,15 +34,15 @@ const REMOVE_BUTTON_RADIUS: number = 10
 const SMALL_SCREEN_WIDTH: number = 640
 const INIT_PADDING: number = 40
 let selected_node_name: string = ''
-let last_center: MyCoordinate | null = null
+let last_center: Coordinate | null = null
 let last_dist: number = 0
 let is_shape_scaling: boolean = false
 
-function getDistance(p1: MyCoordinate, p2: MyCoordinate): number {
+function getDistance(p1: Coordinate, p2: Coordinate): number {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 }
 
-function getCenter(p1: MyCoordinate, p2: MyCoordinate): MyCoordinate {
+function getCenter(p1: Coordinate, p2: Coordinate): Coordinate {
     return {
         x: (p1.x + p2.x) / 2,
         y: (p1.y + p2.y) / 2
@@ -57,7 +57,7 @@ function updateRemoveButtonPosition() {
 function scaleForWheel(event: Konva.KonvaEventObject<WheelEvent>) {
     const SCALE_PROC: number = 1.2
     const pointer = stage.value.getPointerPosition()!
-    const relative_pointer: MyCoordinate = {
+    const relative_pointer: Coordinate = {
         x: pointer.x - stage.value.getAbsolutePosition().x,
         y: pointer.y - stage.value.getAbsolutePosition().y
     }
@@ -99,11 +99,11 @@ function scaleForTouch(event: Konva.KonvaEventObject<TouchEvent>) {
             stage.value.stopDrag()
         }
 
-        const p1: MyCoordinate = {
+        const p1: Coordinate = {
             x: touch1.clientX,
             y: touch1.clientY
         }
-        const p2: MyCoordinate = {
+        const p2: Coordinate = {
             x: touch2.clientX,
             y: touch2.clientY
         }
@@ -121,7 +121,7 @@ function scaleForTouch(event: Konva.KonvaEventObject<TouchEvent>) {
 
         const scale_proc = stage.value.scale()!.x * (cur_dist / last_dist)
         const cur_scale: number = scale_proc / stage.value.scale()!.x
-        const relative_center: MyCoordinate = {
+        const relative_center: Coordinate = {
             x: (new_center.x - stage.value.getAbsolutePosition().x),
             y: (new_center.y - stage.value.getAbsolutePosition().y)
         }
@@ -131,11 +131,11 @@ function scaleForTouch(event: Konva.KonvaEventObject<TouchEvent>) {
             y: scale_proc
         })
 
-        const diff_position: MyCoordinate = {
+        const diff_position: Coordinate = {
             x: new_center.x - last_center.x,
             y: new_center.y - last_center.y
         }
-        const new_pos: MyCoordinate = {
+        const new_pos: Coordinate = {
             x: stage.value.absolutePosition().x - relative_center.x * (cur_scale - 1.0) + diff_position.x,
             y: stage.value.absolutePosition().y - relative_center.y * (cur_scale - 1.0) + diff_position.y,
         }
@@ -296,7 +296,7 @@ function saveImage() {
         x: 1.0,
         y: 1.0
     })
-    transformer_node.destroy()
+    transformer_node?.destroy()
 
     for (let i = 0; i < layer_node.children!.length; i += 1) {
         const top_left_x: number = layer_node.children![i].absolutePosition().x
@@ -329,6 +329,7 @@ function saveImage() {
     link.click()
     document.body.removeChild(link)
 }
+
 function relocate() {
     stage.value.position({
         x: document.body.clientWidth > SMALL_SCREEN_WIDTH ? (document.querySelector<HTMLElement>('.aside')?.offsetWidth ?? 0) + INIT_PADDING : 0,
@@ -338,6 +339,37 @@ function relocate() {
         x: 1.0,
         y: 1.0
     })
+}
+
+function changeZIndex(is_to_top: boolean) {
+    if (selected_node_name === '') { return }
+
+    const selected_node = stage.value.findOne(`.${selected_node_name}`)
+
+    if (selected_node) {
+        if (is_to_top) {
+            selected_node.moveToTop()
+        } else {
+            const background_node = stage.value.findOne(`.${BACKGROUND_IMAGE_NAME}`)
+
+            if (background_node) {
+                selected_node.moveToBottom()
+                background_node.moveToBottom()
+            }
+        }
+    }
+
+    updateTransformer()
+}
+
+function changeColor(color: string) {
+    if (selected_node_name === '' || color === '') { return }
+
+    const selected_node = stage.value.findOne(`.${selected_node_name}`)
+
+    if (selected_node) {
+        selected_node.setAttr('fill', color)
+    }
 }
 
 onMounted(() => {
@@ -451,6 +483,20 @@ watch(() => konva_node_store.is_trigger_relocate, () => {
     if (konva_node_store.is_trigger_relocate) {
         relocate()
         konva_node_store.is_trigger_relocate = false
+    }
+})
+
+watch(() => konva_node_store.is_trigger_change_z_index, () => {
+    if (konva_node_store.is_trigger_change_z_index) {
+        changeZIndex(konva_node_store.is_to_top)
+        konva_node_store.is_trigger_change_z_index = false
+    }
+})
+
+watch(() => konva_node_store.is_trigger_change_color, () => {
+    if (konva_node_store.is_trigger_change_color) {
+        changeColor(konva_node_store.changed_color)
+        konva_node_store.is_trigger_change_color = false
     }
 })
 </script>

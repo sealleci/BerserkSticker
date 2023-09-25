@@ -1,4 +1,15 @@
 <script setup lang="ts">
+import { Ref, onMounted, ref } from 'vue'
+import Konva from 'konva'
+import {
+    Button as TinyButton, Collapse, CollapseItem,
+    TabItem,
+    Tabs
+} from '@opentiny/vue'
+import { IconChevronLeft, IconMinscreenLeft, IconPlus, IconSave, IconUpload, IconUpO, IconDownO } from '@opentiny/vue-icon'
+import { ShapeNode, useKonvaNodeStore } from '@/store/konva_node.ts'
+import { getShape } from '@/utils/shape.ts'
+import CropperModal from '@/components/CropperModal.vue'
 import img_b1 from '@/assets/img/b1.png'
 import img_b2 from '@/assets/img/b2.png'
 import img_b3 from '@/assets/img/b3.png'
@@ -6,25 +17,6 @@ import img_r1 from '@/assets/img/r1.png'
 import img_s1 from '@/assets/img/s1.jpg'
 import img_s2 from '@/assets/img/s2.jpg'
 import img_s3 from '@/assets/img/s3.jpg'
-import CropperModal from '@/components/CropperModal.vue'
-import { ShapeNode, useKonvaNodeStore } from '@/store/konva_node.ts'
-import { getShape } from '@/utils/shape.ts'
-import {
-    Button,
-    Collapse,
-    CollapseItem,
-    TabItem,
-    Tabs
-} from '@opentiny/vue'
-import {
-    IconChevronLeft,
-    IconMinscreenLeft,
-    IconPlus,
-    IconSave,
-    IconUpload
-} from '@opentiny/vue-icon'
-import Konva from 'konva'
-import { Ref, onMounted, ref } from 'vue'
 import 'vue-advanced-cropper/dist/style.css'
 
 type OperationItem = {
@@ -81,6 +73,8 @@ class GeneralList<T = string> {
 const konva_node_store = useKonvaNodeStore()
 const ChevronLeftIcon = IconChevronLeft()
 const UploadIcon = IconUpload()
+const UpIcon = IconUpO()
+const DownIcon = IconDownO()
 const PlusIcon = IconPlus()
 const SaveIcon = IconSave()
 const MinscreenLeftIcon = IconMinscreenLeft()
@@ -127,6 +121,16 @@ const operation_list: OperationItem[] = [
         name: 'Relocate',
         icon: MinscreenLeftIcon,
         handler: triggerRelocate
+    },
+    {
+        name: 'Move to Top',
+        icon: UpIcon,
+        handler: () => triggerChangeZIndex(true)
+    },
+    {
+        name: 'Move to Bottom',
+        icon: DownIcon,
+        handler: () => triggerChangeZIndex(false)
     }
 ]
 const BACKGROUND_FILE_NAME_LIST: string[] = [
@@ -234,6 +238,11 @@ function triggerRelocate() {
     konva_node_store.is_trigger_relocate = true
 }
 
+function triggerChangeZIndex(is_to_top: boolean) {
+    konva_node_store.is_to_top = is_to_top
+    konva_node_store.is_trigger_change_z_index = true
+}
+
 function updateShapePreviews() {
     const SIZE: number = 48
     const default_circle = new Konva.Circle({
@@ -255,6 +264,9 @@ function updateShapePreviews() {
 function changeShapeColor(value: string) {
     selected_shape_node_color.value = value
     updateShapePreviews()
+
+    konva_node_store.changed_color = value
+    konva_node_store.is_trigger_change_color = true
 }
 
 onMounted(() => {
@@ -280,12 +292,12 @@ onMounted(() => {
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list background_list">
-                        <Button class="general_list__item background_list__item background_list__item--middle"
+                        <tiny-button class="general_list__item background_list__item background_list__item--middle"
                             v-for="(item, index) in background_list.data" :key="index"
                             @click="triggerReplaceBackgroundNode(item.value)">
                             <img :src="item.value" />
                             <span>Meta</span>
-                        </Button>
+                        </tiny-button>
                     </div>
                 </collapse-item>
                 <collapse-item title="Avatars" name="avatars">
@@ -294,53 +306,61 @@ onMounted(() => {
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list avatar_list">
-                        <Button class="general_list__item avatar_list__item avatar_list__item--middle"
+                        <tiny-button class="general_list__item avatar_list__item avatar_list__item--middle"
                             v-for="(item, index) in avatar_list.data" :key="index"
                             @click="triggerAddAvatarNode(item.value)">
                             <img :src="item.value" />
                             <span>777</span>
                             <plus-icon></plus-icon>
-                        </Button>
+                        </tiny-button>
                     </div>
                 </collapse-item>
                 <collapse-item title="Shapes" name="shapes">
                     <div class="general_list shape_color_list">
-                        <Button class="general_list__item shape_color_list__item" circle
-                            v-for="(item, index) in shape_color_list" :key="index" @click="changeShapeColor(item)"
-                            :style="{ backgroundColor: item }">
-                        </Button>
+                        <div class="shape_color_list__row">
+                            <tiny-button class="general_list__item shape_color_list__item" circle
+                                v-for="(item, index) in shape_color_list.slice(0, 4)" :key="index"
+                                @click="changeShapeColor(item)" :style="{ backgroundColor: item }">
+                            </tiny-button>
+                        </div>
+                        <div class="shape_color_list__row">
+                            <tiny-button class="general_list__item shape_color_list__item" circle
+                                v-for="(item, index) in shape_color_list.slice(4)" :key="index"
+                                @click="changeShapeColor(item)" :style="{ backgroundColor: item }">
+                            </tiny-button>
+                        </div>
                     </div>
                     <div class="general_list shape_list">
-                        <Button class="general_list__item shape_list__item shape_list__item--middle"
+                        <tiny-button class="general_list__item shape_list__item shape_list__item--middle"
                             v-for="(item, index) in shape_list" :key="index"
                             @click="triggerAddShapeNode(item.type as ShapeNode['type'])">
                             <img :src="item.image.value" />
                             <span>{{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}</span>
                             <plus-icon></plus-icon>
-                        </Button>
+                        </tiny-button>
                     </div>
                 </collapse-item>
                 <collapse-item title="Operations" name="operations">
-                    <Button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
+                    <tiny-button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
                         :key="index" @click="item.handler">
                         <span>{{ item.name }}</span>
                         <component :is="item.icon"></component>
-                    </Button>
+                    </tiny-button>
                 </collapse-item>
             </collapse>
-            <tabs v-model="active_tab_item" v-else @click="clickTabItem">
+            <tabs v-model="active_tab_item" @click="clickTabItem" v-else>
                 <tab-item title="Templates" name="templates">
                     <label class="upload_button">
                         <input type="file" accept="image/*" @change="uploadBackground">
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list background_list">
-                        <Button class="general_list__item background_list__item"
+                        <tiny-button class="general_list__item background_list__item"
                             v-for="(item, index) in background_list.data" :key="index"
                             @click="triggerReplaceBackgroundNode(item.value)">
                             <img :src="item.value" />
                             <span>Meta</span>
-                        </Button>
+                        </tiny-button>
                     </div>
                 </tab-item>
                 <tab-item title="Avatars" name="avatars">
@@ -349,37 +369,45 @@ onMounted(() => {
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list avatar_list">
-                        <Button class="general_list__item avatar_list__item" v-for="(item, index) in avatar_list.data"
+                        <tiny-button class="general_list__item avatar_list__item" v-for="(item, index) in avatar_list.data"
                             :key="index" @click="triggerAddAvatarNode(item.value)">
                             <img :src="item.value" />
                             <span>777</span>
                             <plus-icon></plus-icon>
-                        </Button>
+                        </tiny-button>
                     </div>
                 </tab-item>
                 <tab-item title="Shapes" name="shapes">
                     <div class="general_list shape_color_list">
-                        <Button class="general_list__item shape_color_list__item" circle
-                            v-for="(item, index) in shape_color_list" :key="index" @click="changeShapeColor(item)"
-                            :style="{ backgroundColor: item }">
-                        </Button>
+                        <div class="shape_color_list__row">
+                            <tiny-button class="general_list__item shape_color_list__item" circle
+                                v-for="(item, index) in shape_color_list.slice(0, 4)" :key="index"
+                                @click="changeShapeColor(item)" :style="{ backgroundColor: item }">
+                            </tiny-button>
+                        </div>
+                        <div class="shape_color_list__row">
+                            <tiny-button class="general_list__item shape_color_list__item" circle
+                                v-for="(item, index) in shape_color_list.slice(4)" :key="index"
+                                @click="changeShapeColor(item)" :style="{ backgroundColor: item }">
+                            </tiny-button>
+                        </div>
                     </div>
                     <div class="general_list shape_list">
-                        <Button class="general_list__item shape_list__item" v-for="(item, index) in shape_list" :key="index"
-                            @click="triggerAddShapeNode(item.type as ShapeNode['type'])">
+                        <tiny-button class="general_list__item shape_list__item" v-for="(item, index) in shape_list"
+                            :key="index" @click="triggerAddShapeNode(item.type as ShapeNode['type'])">
                             <img :src="item.image.value" />
                             <span>{{ item.type.charAt(0).toUpperCase() + item.type.slice(1) }}</span>
                             <plus-icon></plus-icon>
-                        </Button>
+                        </tiny-button>
                     </div>
                 </tab-item>
                 <tab-item title="Operations" name="operations">
                     <div class="general_list operation_list">
-                        <Button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
+                        <tiny-button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
                             :key="index" @click="item.handler">
                             <span>{{ item.name }}</span>
                             <component :is="item.icon"></component>
-                        </Button>
+                        </tiny-button>
                     </div>
                 </tab-item>
             </tabs>
@@ -398,7 +426,7 @@ onMounted(() => {
 
 @collapse_icon__radius: 1.5rem;
 @aside__width: 15rem;
-@aside__height: 20rem;
+@aside__height: calc(var(--vh) * 40);
 @tab__nav__height: 3rem;
 @general_list__margin__top: .25rem;
 @row_button__height: 3rem;
@@ -452,7 +480,7 @@ onMounted(() => {
         width: 100%;
         height: 100%;
         overflow-x: hidden;
-        overflow-y: scroll;
+        overflow-y: auto;
 
         @media @screen--small {
             height: 100%;
@@ -577,6 +605,10 @@ onMounted(() => {
         padding: 0;
         border-bottom: 1px solid @grey--light;
         box-sizing: border-box;
+
+        .tiny-tabs__active-bar {
+            display: none;
+        }
     }
 
     :deep(&__nav) {
@@ -692,26 +724,29 @@ onMounted(() => {
 }
 
 .shape_color_list {
-    @padding__left: 1rem;
-
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
     margin-top: 0;
     min-height: @row_button__height;
-    border: 1px solid @grey--light;
+    outline: 1px solid @grey--light;
     border-radius: 1rem;
-    box-sizing: border-box;
-    padding: 0 0 0 @padding__left;
+
+    &__row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
 
     &__item {
         border: 1px solid @grey--light;
-        margin: .5rem @padding__left .5rem 0;
+        margin: .3rem .6rem;
     }
 }
 
 .background_list {
-
     flex-direction: row;
     flex-wrap: wrap;
 
@@ -763,6 +798,10 @@ onMounted(() => {
             border-radius: 50%;
         }
 
+        span {
+            font-size: .8rem;
+        }
+
         svg {
             height: @avatar_item__height;
             width: @avatar_item__height;
@@ -778,6 +817,9 @@ onMounted(() => {
 
     &__item {
         .row_button();
+
+        justify-content: space-between;
+        padding: 0 1rem;
 
         &:first-child {
             margin-top: 0;
