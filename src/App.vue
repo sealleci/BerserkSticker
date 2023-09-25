@@ -89,8 +89,8 @@ onMounted(() => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
-  width: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  width: 100vw;
   overflow: hidden;
 }
 

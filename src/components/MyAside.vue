@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { Ref, onMounted, ref } from 'vue'
 import Konva from 'konva'
-import {
-    Button as TinyButton, Collapse, CollapseItem,
-    TabItem,
-    Tabs
-} from '@opentiny/vue'
+import { Button as TinyButton, Collapse, CollapseItem, TabItem, Tabs } from '@opentiny/vue'
 import { IconChevronLeft, IconMinscreenLeft, IconPlus, IconSave, IconUpload, IconUpO, IconDownO } from '@opentiny/vue-icon'
 import { ShapeNode, useKonvaNodeStore } from '@/store/konva_node.ts'
 import { getShape } from '@/utils/shape.ts'
