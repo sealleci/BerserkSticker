@@ -96,13 +96,12 @@ onMounted(() => {
 
 .circle_stencil {
     position: relative;
-    border: 2px dashed white;
+    outline: 2px solid white;
     border-radius: 50%;
-    box-sizing: border-box;
     cursor: move;
 
     &__handler {
-        @handler__size: 2.5rem;
+        @handler__size: 2.25rem;
 
         display: flex;
         align-items: center;
@@ -116,13 +115,12 @@ onMounted(() => {
         border: 2px dashed white;
         border-radius: 50%;
         box-sizing: border-box;
-        opacity: .9;
         cursor: ne-resize;
         z-index: 1;
 
 
         svg {
-            @icon__size: 1.5rem;
+            @icon__size: 1.25rem;
 
             height: @icon__size;
             width: @icon__size;

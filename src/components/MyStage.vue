@@ -363,7 +363,7 @@ function changeZIndex(is_to_top: boolean) {
 }
 
 function changeColor(color: string) {
-    if (selected_node_name === '' || color === '') { return }
+    if (selected_node_name === '' || selected_node_name.includes('avatar') || color === '') { return }
 
     const selected_node = stage.value.findOne(`.${selected_node_name}`)
 

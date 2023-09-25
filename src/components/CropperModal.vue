@@ -157,10 +157,10 @@ watch(isModalShow, (new_value) => {
 
 .crop_button {
     height: 2.5rem;
-    width: 40%;
+    width: 6rem;
     color: white;
     background-color: @theme_color;
-    font-size: 1.5rem;
+    font-size: 1rem;
     border: none;
     cursor: pointer;
     transition: background-color @animation__duration--short;

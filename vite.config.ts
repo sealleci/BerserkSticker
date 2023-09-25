@@ -32,7 +32,7 @@ export default defineConfig({
           }
         }
       ],
-      undefined
+      'pc'
     )
   ],
   define: {

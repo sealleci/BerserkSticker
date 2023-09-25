@@ -173,8 +173,22 @@ function uploadBackground(payload: Event) {
         reader.onload = e => {
             if (!e.target) { return }
 
-            background_list.value.push(e.target.result as string)
-            input.value = ''
+
+
+            const data_url = e.target.result as string
+
+            if (!data_url.startsWith('data:')) { return }
+
+            const img = new Image()
+
+            img.onload = () => {
+                background_list.value.push(data_url)
+                input.value = ''
+            }
+            img.onerror = () => {
+                console.log('Background image error.')
+            }
+            img.src = data_url
         }
 
         reader.readAsDataURL(input.files[0]);
@@ -187,16 +201,28 @@ function uploadAvatar(payload: Event) {
     const input = payload.target as HTMLInputElement
 
     if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = e => {
+        const reader = new FileReader()
+
+        reader.onload = (e) => {
             if (!e.target) { return }
 
-            avatar_data_url.value = e.target.result as string
-            input.value = ''
-            is_modal_show.value = true
-        }
+            const data_url = e.target.result as string
 
-        reader.readAsDataURL(input.files[0]);
+            if (!data_url.startsWith('data:')) { return }
+
+            const img = new Image()
+
+            img.onload = () => {
+                avatar_data_url.value = data_url
+                input.value = ''
+                is_modal_show.value = true
+            }
+            img.onerror = () => {
+                console.log('Avatar image error.')
+            }
+            img.src = data_url
+        }
+        reader.readAsDataURL(input.files[0])
     }
 }
 
@@ -351,8 +377,8 @@ onMounted(() => {
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list background_list">
-                        <tiny-button class="general_list__item background_list__item"
-                            v-for="(item, index) in background_list.data" :key="index"
+                        <tiny-button v-for="(item, index) in background_list.data" :key="index"
+                            class="general_list__item background_list__item"
                             @click="triggerReplaceBackgroundNode(item.value)">
                             <img :src="item.value" />
                             <span>Meta</span>
@@ -399,8 +425,8 @@ onMounted(() => {
                 </tab-item>
                 <tab-item title="Operations" name="operations">
                     <div class="general_list operation_list">
-                        <tiny-button class="general_list__item operation_list__item" v-for="(item, index) in operation_list"
-                            :key="index" @click="item.handler">
+                        <tiny-button class="general_list__item operation_list__item operation_list__item--mobile"
+                            v-for="(item, index) in operation_list" :key="index" @click="item.handler">
                             <span>{{ item.name }}</span>
                             <component :is="item.icon"></component>
                         </tiny-button>
@@ -420,12 +446,13 @@ onMounted(() => {
 <style scoped lang="less">
 @import (reference) "@/less/general.less";
 
-@collapse_icon__radius: 1.5rem;
+@collapse_icon__radius: 1.25rem;
 @aside__width: 15rem;
-@aside__height: calc(var(--vh) * 40);
-@tab__nav__height: 3rem;
+@aside__height: calc(var(--vh) * 45);
+@tab__nav__height: 2.5rem;
 @general_list__margin__top: .25rem;
-@row_button__height: 3rem;
+@row_button__height: 2.5rem;
+@mobile_font_size: .8rem;
 
 .my_scrollbar() {
     &::-webkit-scrollbar {
@@ -642,6 +669,7 @@ onMounted(() => {
         }
 
         &__title {
+            font-size: @mobile_font_size;
             user-select: none;
         }
     }
@@ -676,8 +704,8 @@ onMounted(() => {
     }
 
     svg {
-        height: 1.5rem;
-        width: 1.5rem;
+        height: 1.25rem;
+        width: 1.25rem;
         fill: @black;
     }
 }
@@ -753,16 +781,25 @@ onMounted(() => {
         height: fit-content;
         border-radius: 1rem;
 
-        &--middle {
+        &.background_list__item--middle {
             width: 100%;
+
+            img {
+                height: 8rem;
+            }
+
+            span {
+                font-size: 1rem;
+            }
         }
 
         img {
-            height: 9rem;
+            height: 5rem;
         }
 
         span {
-            margin: .5rem 0;
+            margin: .25rem 0;
+            font-size: @mobile_font_size;
         }
     }
 }
@@ -773,34 +810,47 @@ onMounted(() => {
     flex-wrap: wrap;
 
     &__item {
-        @avatar_item__height: 3rem;
+        @avatar_item__height: 2.25rem;
         @avatar_item__padding: 4px;
+        @icon_item__diameter: 1.55rem;
 
         flex-direction: row;
         justify-content: space-between;
-        width: 45%;
+        width: 48%;
         height: calc(@avatar_item__height + @avatar_item__padding * 2);
         padding: @avatar_item__padding;
         border-radius: @avatar_item__height;
         box-sizing: border-box;
 
-        &--middle {
+        &.avatar_list__item--middle,
+        &.shape_list__item--middle {
             width: 100%;
+
+            span {
+                font-size: 1rem;
+            }
+
+            svg {
+                height: @avatar_item__height;
+                width: @avatar_item__height;
+            }
         }
 
         img {
+            flex-shrink: 0;
             height: @avatar_item__height;
             width: @avatar_item__height;
             border-radius: 50%;
         }
 
         span {
-            font-size: .8rem;
+            font-size: @mobile_font_size;
         }
 
         svg {
-            height: @avatar_item__height;
-            width: @avatar_item__height;
+            flex-shrink: 0;
+            height: @icon_item__diameter;
+            width: @icon_item__diameter;
             fill: @grey;
             transform: scale(.6);
         }
@@ -826,6 +876,12 @@ onMounted(() => {
             color: @black;
             font-size: 1rem;
             line-height: 1rem;
+        }
+
+        &.operation_list__item--mobile {
+            span {
+                font-size: @mobile_font_size;
+            }
         }
     }
 }
