@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { Ref, onMounted, ref } from 'vue'
 import Konva from 'konva'
-import { Button as TinyButton, Collapse, CollapseItem, TabItem, Tabs } from '@opentiny/vue'
+import { Button as TinyButton, Collapse, CollapseItem } from '@opentiny/vue'
 import { IconChevronLeft, IconMinscreenLeft, IconPlus, IconSave, IconUpload, IconUpO, IconDownO } from '@opentiny/vue-icon'
 import { ShapeNode, useKonvaNodeStore } from '@/store/konva_node.ts'
 import { getShape } from '@/utils/shape.ts'
 import CropperModal from '@/components/CropperModal.vue'
+import MyTabs from '@/components/MyTabs.vue'
+import MyTabItem from '@/components/MyTabItem.vue'
 import img_b1 from '@/assets/img/b1.png'
 import img_b2 from '@/assets/img/b2.png'
 import img_b3 from '@/assets/img/b3.png'
@@ -159,8 +161,8 @@ function clickCollapseItem(active_items: string[]) {
     }
 }
 
-function clickTabItem(tab: { name: string, title: string }) {
-    active_collapse_item_list.value = [tab.name]
+function clickTabItem(name: string) {
+    active_collapse_item_list.value = [name]
 }
 
 function uploadBackground(payload: Event) {
@@ -370,8 +372,8 @@ onMounted(() => {
                     </tiny-button>
                 </collapse-item>
             </collapse>
-            <tabs v-model="active_tab_item" @click="clickTabItem" v-else>
-                <tab-item title="Templates" name="templates">
+            <my-tabs v-model="active_tab_item" @click="clickTabItem" v-else>
+                <my-tab-item title="Templates" name="templates">
                     <label class="upload_button">
                         <input type="file" accept="image/*" @change="uploadBackground">
                         <upload-icon></upload-icon>
@@ -384,8 +386,8 @@ onMounted(() => {
                             <span>Meta</span>
                         </tiny-button>
                     </div>
-                </tab-item>
-                <tab-item title="Avatars" name="avatars">
+                </my-tab-item>
+                <my-tab-item title="Avatars" name="avatars">
                     <label class="upload_button">
                         <input type="file" accept="image/*" @change="uploadAvatar">
                         <upload-icon></upload-icon>
@@ -398,8 +400,8 @@ onMounted(() => {
                             <plus-icon></plus-icon>
                         </tiny-button>
                     </div>
-                </tab-item>
-                <tab-item title="Shapes" name="shapes">
+                </my-tab-item>
+                <my-tab-item title="Shapes" name="shapes">
                     <div class="general_list shape_color_list">
                         <div class="shape_color_list__row">
                             <tiny-button class="general_list__item shape_color_list__item" circle
@@ -422,8 +424,8 @@ onMounted(() => {
                             <plus-icon></plus-icon>
                         </tiny-button>
                     </div>
-                </tab-item>
-                <tab-item title="Operations" name="operations">
+                </my-tab-item>
+                <my-tab-item title="Operations" name="operations">
                     <div class="general_list operation_list">
                         <tiny-button class="general_list__item operation_list__item operation_list__item--mobile"
                             v-for="(item, index) in operation_list" :key="index" @click="item.handler">
@@ -431,8 +433,8 @@ onMounted(() => {
                             <component :is="item.icon"></component>
                         </tiny-button>
                     </div>
-                </tab-item>
-            </tabs>
+                </my-tab-item>
+            </my-tabs>
         </div>
         <div class="collapse_button" @click="toggleAside">
             <chevron-left-icon></chevron-left-icon>
@@ -777,7 +779,7 @@ onMounted(() => {
     &__item {
         flex-direction: column;
         justify-content: center;
-        width: 45%;
+        width: 48%;
         height: fit-content;
         border-radius: 1rem;
 
@@ -794,7 +796,7 @@ onMounted(() => {
         }
 
         img {
-            height: 5rem;
+            height: 6rem;
         }
 
         span {

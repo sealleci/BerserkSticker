@@ -16,7 +16,7 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src')
     },
-    extensions: ['.js', '.jsx', '.vue']
+    extensions: ['.js', '.jsx', '.vue', '.ts', '.tsx']
   },
   plugins: [
     vue(),
@@ -48,9 +48,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           vue: ['vue', 'pinia'],
-          ui1: ['@opentiny/vue-button', '@opentiny/vue-tabs', '@opentiny/vue-modal'],
-          ui2: ['@opentiny/vue-collapse', '@opentiny/vue-collapse-item', '@opentiny/vue-tab-item'],
-          graphic: ['konva', 'vue-advanced-cropper'],
+          ui: ['@opentiny/vue-button', '@opentiny/vue-modal', '@opentiny/vue-collapse', '@opentiny/vue-collapse-item'],
+          graphic: ['konva', 'vue-advanced-cropper']
         }
       }
     }
