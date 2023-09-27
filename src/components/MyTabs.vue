@@ -40,7 +40,7 @@ onMounted(() => {
         </div>
         <div class="my_tabs__container">
             <template v-for="(item, index) in tab_node_list" :key="index">
-                <component :is="item" v-if="modelValue === tab_name_list[index]" />
+                <component :is="item" v-show="modelValue === tab_name_list[index]" />
             </template>
         </div>
     </div>
