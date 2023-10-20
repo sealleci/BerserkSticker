@@ -2,13 +2,14 @@
 import { onMounted, ref } from 'vue'
 import MyAside from '@/components/MyAside.vue'
 import MyStage from '@/components/MyStage.vue'
-import img_b1 from '@/assets/img/b1.png'
-import img_b2 from '@/assets/img/b2.png'
-import img_b3 from '@/assets/img/b3.png'
-import img_r1 from '@/assets/img/r1.png'
-import img_s1 from '@/assets/img/s1.jpg'
-import img_s2 from '@/assets/img/s2.jpg'
-import img_s3 from '@/assets/img/s3.jpg'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import ImgB1 from '@/assets/img/b1.png'
+import ImgB2 from '@/assets/img/b2.png'
+import ImgB3 from '@/assets/img/b3.png'
+import ImgR1 from '@/assets/img/r1.png'
+import ImgS1 from '@/assets/img/s1.jpg'
+import ImgS2 from '@/assets/img/s2.jpg'
+import ImgS3 from '@/assets/img/s3.jpg'
 
 const isLoading = ref<boolean>(true)
 
@@ -44,13 +45,13 @@ onMounted(() => {
   }, { passive: false })
 
   preloadImages([
-    img_b1,
-    img_b2,
-    img_b3,
-    img_r1,
-    img_s1,
-    img_s2,
-    img_s3
+    ImgB1,
+    ImgB2,
+    ImgB3,
+    ImgR1,
+    ImgS1,
+    ImgS2,
+    ImgS3
   ]).catch(console.error)
 })
 </script>
@@ -58,16 +59,7 @@ onMounted(() => {
 <template>
   <div class="app__container">
     <template v-if="isLoading">
-      <div className="loading_spinner">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
+      <LoadingSpinner />
     </template>
     <template v-else>
       <aside>
@@ -98,114 +90,5 @@ main {
   background-color: @white;
   height: 100%;
   width: 100%;
-}
-
-@keyframes spinner_rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-.loading_spinner {
-  @diameter: 80px;
-
-  display: block;
-  position: relative;
-  width: @diameter;
-  height: calc(var(--vh, 1vh) * 100);
-  padding-top: calc(calc(var(--vh, 1vh) * 50) - @diameter / 2);
-  background-color: transparent;
-
-  div {
-    animation: spinner_rotate 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    transform-origin: 40px 40px;
-
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: rgb(154, 102, 184);
-      margin: -4px 0 0 -4px;
-    }
-
-    &:nth-child(1) {
-      animation-delay: -0.036s;
-
-      &::after {
-        top: 63px;
-        left: 63px;
-      }
-    }
-
-    &:nth-child(2) {
-      animation-delay: -0.072s;
-
-      &::after {
-        top: 68px;
-        left: 56px;
-      }
-    }
-
-    &:nth-child(3) {
-      animation-delay: -0.108s;
-
-      &::after {
-        top: 71px;
-        left: 48px;
-      }
-    }
-
-    &:nth-child(4) {
-      animation-delay: -0.144s;
-
-      &::after {
-        top: 72px;
-        left: 40px;
-      }
-    }
-
-    &:nth-child(5) {
-      animation-delay: -0.18s;
-
-      &::after {
-        top: 71px;
-        left: 32px;
-      }
-    }
-
-    &:nth-child(6) {
-      animation-delay: -0.216s;
-
-      &::after {
-        top: 68px;
-        left: 24px;
-      }
-    }
-
-    &:nth-child(7) {
-      animation-delay: -0.252s;
-
-      &::after {
-        top: 63px;
-        left: 17px;
-      }
-    }
-
-    &:nth-child(8) {
-      animation-delay: -0.288s;
-
-      &::after {
-        top: 56px;
-        left: 12px;
-      }
-    }
-  }
 }
 </style>
