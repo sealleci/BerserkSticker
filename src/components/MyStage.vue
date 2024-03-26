@@ -508,6 +508,14 @@ watch(() => konva_node_store.is_trigger_change_color, () => {
 
 <style scoped lang="less">
 #stage {
+    @line_color: rgba(158, 105, 204, 0.2);
+
     overflow: hidden;
+    background:
+        linear-gradient(0deg, transparent 24%, @line_color 25%, @line_color 26%, transparent 27%, transparent 74%, @line_color 75%, @line_color 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, @line_color 25%, @line_color 26%, transparent 27%, transparent 74%, @line_color 75%, @line_color 76%, transparent 77%, transparent);
+    background-size: 3rem 3rem;
+    background-position: -1rem -1rem;
+    background-repeat: repeat;
 }
 </style>
