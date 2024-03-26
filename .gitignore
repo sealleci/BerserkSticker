@@ -8,13 +8,13 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-# dist
 dist-ssr
 *.local
 
 ref
 tmp
-src/assets/img/*
+draft
+dist
 
 # Editor directories and files
 # .vscode/*

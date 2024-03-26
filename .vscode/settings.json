@@ -1,13 +1,1 @@
-{
-    "path-intellisense.mappings": {
-        "@": "${workspaceRoot}/src/"
-    },
-    "less.compile": {
-        "out": "../css/"
-    },
-    "typescript.tsdk": "node_modules/typescript/lib",
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    },
-    "python.formatting.provider": "none"
-}
+{}

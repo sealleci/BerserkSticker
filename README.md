@@ -6,7 +6,7 @@ HAPPY BIRTHDAY!
 
 ## Description
 
-A simple photo editor with stickers. "Berserk" theme.
+A simple photo editor with stickers.
 
 ## Images
 
