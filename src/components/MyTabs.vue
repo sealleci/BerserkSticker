@@ -1,4 +1,4 @@
-<script  lang="ts" setup>
+<script lang="ts" setup>
 import { useSlots, onMounted } from 'vue'
 import type { VNode } from 'vue'
 
@@ -66,7 +66,7 @@ onMounted(() => {
         &__scroll_bar {
             display: flex;
             flex-direction: row;
-            justify-content: flex-start;
+            justify-content: safe center;
             align-items: center;
             width: 100%;
             height: 100%;

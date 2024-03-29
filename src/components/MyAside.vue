@@ -393,8 +393,9 @@ onMounted(() => {
                         <upload-icon></upload-icon>
                     </label>
                     <div class="general_list avatar_list">
-                        <tiny-button class="general_list__item avatar_list__item" v-for="(item, index) in avatar_list.data"
-                            :key="index" @click="triggerAddAvatarNode(item.value)">
+                        <tiny-button class="general_list__item avatar_list__item"
+                            v-for="(item, index) in avatar_list.data" :key="index"
+                            @click="triggerAddAvatarNode(item.value)">
                             <img :src="item.value" />
                             <span>777</span>
                             <plus-icon></plus-icon>
